@@ -1,0 +1,50 @@
+# syntax inspired by GraphQL
+
+import Email
+import EmailCtx2
+import Person
+import MsFileWorkspaces
+import MsFileDocuments
+
+
+# HKT is implicit
+type MyAppType {
+   file_name: EmailSubject
+   cm: ImClientMatterNum
+   storage_loc:  StorageLoc
+}
+
+
+type Receipt {
+    name: ImDocumentName
+    id: ImDocumentId
+}
+
+type StorageLoc {
+    cm: ImClientMatterNum
+    name: WorkspaceName
+    id: WorkspaceId
+}
+
+named scalar "MyFirstName" String
+named scalar "MyLastName" String
+
+# atoms are POST HTTP endpoints with JSON inputs and outputs
+
+# EmailSubject can be DI-ied
+atom parseCm http://blah EmailSubject -> ImClientMatterNum
+
+# Person contains Email
+# logic solver will populate inventor_email in MyAppType by composing with parseInventor
+atom lookupStorage http://blah ImClientMatterNum -> WorkspaceRef
+
+
+# file in DMS
+# MyAppType and RawEmail can be DI-ied
+#
+# alternative
+# atom fileEmail http://blah {data: Option<ClientMatterNumber>, email: RawEmail} -> Receipt
+atom fileEmail http://blah {data: MyAppType, email: RawEmail} -> Receipt
+
+
+

@@ -1,0 +1,44 @@
+<template type="MyAppType"
+      version="2.10.2"
+      app-icon="fas fa-envelopes-bulk"
+      app-name="Example Filing App"
+      app-id="example-app"
+      app-hosts="outlook"
+      document-link=""
+
+      enable-init-action="true"
+      init-action="complete"
+      >
+      <actions>
+            <action name="fileEmail"
+                  atom="fileEmail">
+                <result>
+                    <success var="res">
+                    <modal title="Success">
+                        <text label="Upload Name" input-options="read-only"  value="res.name" />
+                        <text label="Upload ID" input-options="read-only"  value="res.id" />
+                    </modal>
+                    </success>
+                    <failure var="errmsg">
+                        <alert title="Test snackbar failure">
+                        <static-text recommendation="errmsg.msg" />
+                         <text label="Result" input-options="read-only"  value="errmsg.details" />
+                        </alert>
+                    </failure>
+                </result>
+        </action>
+      </actions>
+
+    <nest>
+        <text label="File Name"   value="data.file_name" />
+        <text label="Parsed Client Matter" value="data.cm" />
+        <nest jf-for="location in data.storage_loc">
+          <static-text title="Workspace Name" recommendation="location.name" />
+          <text label="Workspace Client Matter" value="location.cm" />
+          <text label="Workspace Id"   value="location.id" />
+          <button title="File" action="fileEmail" variant="text" icon="fa fa-bars-progress" />
+        </nest>
+    </nest>
+
+
+</template>

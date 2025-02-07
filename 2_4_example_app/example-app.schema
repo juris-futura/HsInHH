@@ -1,0 +1,166 @@
+# syntax inspired by GraphQL
+
+import Email
+import EmailCtx2
+import Person
+import MsFileWorkspaces
+import MsFileDocuments
+import MsFileFolders
+
+
+# HKT is implicit
+type MyAppType {
+   file_name: EmailSubject
+   cm: ImClientMatterNum
+   storage_loc:  StorageLoc
+}
+
+
+type Receipt {
+    name: ImDocumentName
+    id: ImDocumentId
+}
+
+type StorageLoc {
+    cm: ImClientMatterNum
+    name: WorkspaceName
+    id: WorkspaceId
+}
+
+named scalar "MyFirstName" String
+named scalar "MyLastName" String
+
+# atoms are POST HTTP endpoints with JSON inputs and outputs
+
+# EmailSubject can be DI-ied
+atom parseCm
+    ```endp-json
+    {
+        "serviceType":"MS",
+        "serviceName":"ms-platform-agent",
+        "route":"run/molecule/example-app/mol-parseCm"
+    }
+    ```
+   EmailSubject -> ImClientMatterNum
+
+# Person contains Email
+# logic solver will populate inventor_email in MyAppType by composing with parseInventor
+atom lookupStorage
+    ```endp-json
+    {
+        "serviceType":"MS",
+        "serviceName":"ms-platform-agent",
+        "route":"run/molecule/example-app/mol-lookupStorage"
+    }
+    ```
+    ImClientMatterNum -> StorageLoc
+
+
+# file in DMS
+# MyAppType and RawEmail can be DI-ied
+#
+# alternative
+# atom fileEmail http://blah {data: Option<ClientMatterNumber>, email: RawEmail} -> Receipt
+atom fileEmail
+    ```endp-json
+    {
+        "serviceType":"MS",
+        "serviceName":"ms-platform-agent",
+        "route":"run/molecule/example-app/mol-fileEmail"
+    }
+    ```
+    {data: MyAppType, email: RawEmail} -> Receipt
+
+
+
+molecule mol-parseCm EmailSubject -> ImClientMatterNum
+```molecule-yaml:mol-parseCm
+steps:
+- use_hardcode:
+    output_type: "{guid: Guid, callerapp: CallerApp}"
+    value: {
+        guid: "test-guid",
+        callerapp: "example-app"
+    }
+- use_atom_name: workspaces-from-emailsubject
+- use_extract:
+   input_type: WorkspacesFromEmailSubjectRes
+   extract_type:  ImClientMatterNum
+   output_type: "{x: Option<ImClientMatterNum>}"
+- use_match:
+    match: "Option<ImClientMatterNum>"
+    match_type: value
+    cases:
+    - of: null
+      do:
+        throw:
+            msg: CM not found in ${EmailSubject}
+    default:
+        return: ImClientMatterNum
+```
+
+molecule mol-lookupStorage ImClientMatterNum -> StorageLoc
+```molecule-yaml:mol-lookupStorage
+steps:
+- use_hardcode:
+    output_type: "{guid: Guid, callerapp: CallerApp}"
+    value: {
+        guid: "test-guid",
+        callerapp: "example-app"
+    }
+- use_atom_name: workspace-by-clientmatter
+- use_coerce: WorkspaceRef -> StorageLoc
+```
+
+molecule mol-fileEmail  {data: MyAppType, email: RawEmail} -> Receipt
+```molecule-yaml:mol-fileEmail
+steps:
+- use_extract:
+   input_type: MyAppType
+   extract_type:  WorkspaceId
+   output_type: "{x: Option<WorkspaceId>}"
+
+- use_match:
+    match: "Option<WorkspaceId>"
+    match_type: value
+    cases:
+    - of: null
+      do:
+        throw:
+            msg: WorkspaceId needs to be set before uploading
+    default:
+        return: WorkspaceId
+
+- use_hardcode:
+    output_type: "{guid: Guid, callerapp: CallerApp, folder: ImFolder, fileClass: FileClass}"
+    value: {
+        guid: "test-guid",
+        callerapp: "example-app",
+        folder: {
+            "@": "ImFolderAutomatic",
+            decide_list_name: null
+        },
+        fileClass: {
+            "@": "FileClassChoice",
+            external: "PERM CLIENT RECORD",
+            internal: "INTERNAL"
+        }
+    }
+- use_atom_name: ws-upload-raw-email
+- use_extract:
+    input_type: UploadEmailResult
+    extract_type: ImDocumentRef
+    output_type: "{x: Option<ImDocumentRef>}"
+
+- use_match:
+    match: "Option<ImDocumentRef>"
+    match_type: value
+    cases:
+    - of: null
+      do:
+        throw:
+            msg: Upload failed ${[UploadFailure]}
+    default:
+        use_coerce: ImDocumentRef -> Receipt
+
+```
