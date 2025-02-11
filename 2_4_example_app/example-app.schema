@@ -69,7 +69,7 @@ atom fileEmail
         "route":"run/molecule/example-app/mol-fileEmail"
     }
     ```
-    {data: MyAppType, email: RawEmail} -> Receipt
+    {guid: Guid, data: MyAppType, email: RawEmail} -> Receipt
 
 
 
@@ -112,7 +112,7 @@ steps:
 - use_coerce: WorkspaceRef -> StorageLoc
 ```
 
-molecule mol-fileEmail  {data: MyAppType, email: RawEmail} -> Receipt
+molecule mol-fileEmail  {guid: Guid, data: MyAppType, email: RawEmail} -> Receipt
 ```molecule-yaml:mol-fileEmail
 steps:
 - use_extract:
@@ -132,9 +132,8 @@ steps:
         return: WorkspaceId
 
 - use_hardcode:
-    output_type: "{guid: Guid, callerapp: CallerApp, folder: ImFolder, fileClass: FileClass}"
+    output_type: "{callerapp: CallerApp, folder: ImFolder, fileClass: FileClass}"
     value: {
-        guid: "test-guid",
         callerapp: "example-app",
         folder: {
             "@": "ImFolderAutomatic",

@@ -44,7 +44,7 @@ atom lookupStorage http://blah ImClientMatterNum -> WorkspaceRef
 #
 # alternative
 # atom fileEmail http://blah {data: Option<ClientMatterNumber>, email: RawEmail} -> Receipt
-atom fileEmail http://blah {data: MyAppType, email: RawEmail} -> Receipt
+atom fileEmail http://blah {guid: Guid, data: MyAppType, email: RawEmail} -> Receipt
 
 
 
