@@ -5,7 +5,7 @@
 
 * intended as replacement to expressions
 * molecule langague is based on the concept of DI
-* syntax is in yaml and consist of build in steps
+* syntax in yaml and consist of built-in steps
 
 * lots of steps are based on internal optics (Juvo type traversed using other Juvo type).
 * support for type variables
@@ -14,7 +14,7 @@
 ## Pros
 
 * imperative
-* more declarative alternative to python
+* more declarative alternative to writing python
 * simpler to use than expressions
 * ideal for testing atoms
 
