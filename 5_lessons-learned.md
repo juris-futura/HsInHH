@@ -15,3 +15,4 @@
    - does not work well with agile incremental development
 
 * PL approach is powerful
+   - small targeted PL with strong type checker

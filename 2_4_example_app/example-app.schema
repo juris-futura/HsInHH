@@ -30,6 +30,61 @@ type StorageLoc {
 named scalar "MyFirstName" String
 named scalar "MyLastName" String
 
+# actino molecule
+molecule mol-fileEmail  {guid: Guid, data: MyAppType, email: RawEmail} -> Receipt
+```molecule-yaml:mol-fileEmail
+steps:
+- use_extract:
+   input_type: MyAppType
+   extract_type:  WorkspaceId
+   output_type: "{x: Option<WorkspaceId>}"
+
+- use_match:
+    match: "Option<WorkspaceId>"
+    match_type: value
+    cases:
+    - of: null
+      do:
+        throw:
+            msg: WorkspaceId needs to be set before uploading
+    default:
+        return: WorkspaceId
+
+- use_hardcode:
+    output_type: "{callerapp: CallerApp, folder: ImFolder, fileClass: FileClass}"
+    value: {
+        callerapp: "example-app",
+        folder: {
+            "@": "ImFolderAutomatic",
+            decide_list_name: null
+        },
+        fileClass: {
+            "@": "FileClassChoice",
+            external: "PERM CLIENT RECORD",
+            internal: "INTERNAL"
+        }
+    }
+
+- use_atom_name: ws-upload-raw-email
+
+- use_extract:
+    input_type: UploadEmailResult
+    extract_type: ImDocumentRef
+    output_type: "{x: Option<ImDocumentRef>}"
+
+- use_match:
+    match: "Option<ImDocumentRef>"
+    match_type: value
+    cases:
+    - of: null
+      do:
+        throw:
+            msg: Upload failed ${[UploadFailure]}
+    default:
+        use_coerce: ImDocumentRef -> Receipt
+
+```
+
 # atoms are POST HTTP endpoints with JSON inputs and outputs
 
 # EmailSubject can be DI-ied
@@ -54,22 +109,6 @@ atom lookupStorage
     }
     ```
     ImClientMatterNum -> StorageLoc
-
-
-# file in DMS
-# MyAppType and RawEmail can be DI-ied
-#
-# alternative
-# atom fileEmail http://blah {data: Option<ClientMatterNumber>, email: RawEmail} -> Receipt
-atom fileEmail
-    ```endp-json
-    {
-        "serviceType":"MS",
-        "serviceName":"ms-platform-agent",
-        "route":"run/molecule/example-app/mol-fileEmail"
-    }
-    ```
-    {guid: Guid, data: MyAppType, email: RawEmail} -> Receipt
 
 
 
@@ -112,54 +151,3 @@ steps:
 - use_coerce: WorkspaceRef -> StorageLoc
 ```
 
-molecule mol-fileEmail  {guid: Guid, data: MyAppType, email: RawEmail} -> Receipt
-```molecule-yaml:mol-fileEmail
-steps:
-- use_extract:
-   input_type: MyAppType
-   extract_type:  WorkspaceId
-   output_type: "{x: Option<WorkspaceId>}"
-
-- use_match:
-    match: "Option<WorkspaceId>"
-    match_type: value
-    cases:
-    - of: null
-      do:
-        throw:
-            msg: WorkspaceId needs to be set before uploading
-    default:
-        return: WorkspaceId
-
-- use_hardcode:
-    output_type: "{callerapp: CallerApp, folder: ImFolder, fileClass: FileClass}"
-    value: {
-        callerapp: "example-app",
-        folder: {
-            "@": "ImFolderAutomatic",
-            decide_list_name: null
-        },
-        fileClass: {
-            "@": "FileClassChoice",
-            external: "PERM CLIENT RECORD",
-            internal: "INTERNAL"
-        }
-    }
-- use_atom_name: ws-upload-raw-email
-- use_extract:
-    input_type: UploadEmailResult
-    extract_type: ImDocumentRef
-    output_type: "{x: Option<ImDocumentRef>}"
-
-- use_match:
-    match: "Option<ImDocumentRef>"
-    match_type: value
-    cases:
-    - of: null
-      do:
-        throw:
-            msg: Upload failed ${[UploadFailure]}
-    default:
-        use_coerce: ImDocumentRef -> Receipt
-
-```

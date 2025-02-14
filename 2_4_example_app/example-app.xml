@@ -11,7 +11,7 @@
       >
       <actions>
             <action name="fileEmail"
-                  atom="fileEmail">
+                  molecule="mol-fileEmail">
                 <result>
                     <success var="res">
                     <modal title="Success">
