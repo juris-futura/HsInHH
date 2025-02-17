@@ -15,8 +15,8 @@
                 <result>
                     <success var="res">
                     <modal title="Success">
-                        <text label="Upload Name" input-options="read-only"  value="res.name" />
-                        <text label="Upload ID" input-options="read-only"  value="res.id" />
+                        <text-area label="Saved File Name"  value="res.name" />
+                        <text label="Saved ID" input-options="read-only"  value="res.id" />
                     </modal>
                     </success>
                     <failure var="errmsg">
@@ -36,7 +36,7 @@
           <static-text title="Workspace Name" recommendation="location.name" />
           <text label="Workspace Client Matter" value="location.cm" />
           <text label="Workspace Id"   value="location.id" />
-          <button title="File" action="fileEmail" variant="text" icon="fa fa-bars-progress" />
+          <button title="File" action="fileEmail" icon="fa fa-bars-progress" />
         </nest>
     </nest>
 
