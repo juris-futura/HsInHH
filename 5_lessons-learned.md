@@ -11,8 +11,14 @@ Cons:
 * PL is hard to change
    - does not work well with agile incremental development
    - very hard to avoid idiosyncrasies / inconsistencies
+   - hard to do without operational semantics
    - compilation warnings slow deprecation path
-   - extra work (e.g. app registry)
+   - many tools are no longer free (e.g. app registry)
+   - _all fixes are breaking_
+
+* deprecation tools are needed
+   - compilation warnings
+   - compilation flags
 
 * logic-solver engineering challenges
    - different way of thinking
@@ -28,3 +34,7 @@ Pros:
    - small targeted PL with strong type checker
    - ability to expose powerful patterns not available in mainstream PLs
    - compilation warnings are a powerfull tool
+
+* specific benefits
+   - simplified UI
+   - HTTP endpoint manipulation
