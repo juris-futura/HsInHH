@@ -40,7 +40,60 @@ expr :=
   }
 ```
 
+More complex example
+
+```json
+{
+    "fxn": {
+        "fxn": {
+            "operator": ":*:"
+        },
+        "x": {
+            "fxn": {
+                "fxn": {
+                    "operator": ":$:"
+                },
+                "x": {
+                    "operator": "__constrNT__p1;p2"
+                }
+            },
+            "x": {
+                "atom": "atom1"
+            }
+        }
+    },
+    "x": {
+        "fxn": {
+            "operator": "pure"
+        },
+        "x": {
+            "json": "P2 value"
+        }
+    }
+}
+```
+
 ## Examples:
+
+compose atom1 and atom2
+```json
+{
+    "fxn": {
+        "fxn": {
+            "operator": ">>>"
+        },
+        "x": {
+            "atom": "atom1"
+        }
+    },
+    "x": {
+        "atom": "atom2"
+    }
+}
+```
+
+
+(available inside HH network only)
 
 https://github.com/juris-futura/juvo-way/blob/master/Expressions.md
 https://github.com/juris-futura/lib-juvo-common/tree/main/test/TestEval
